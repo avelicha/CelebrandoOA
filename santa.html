@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa Claus Mandando Besos</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            position: relative;
+        }
+
+        h1 {
+            color: #fff;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        canvas {
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .btn-kiss {
+            margin-top: 15px;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-kiss:hover {
+            background-color: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .btn-kiss:active {
+            transform: scale(0.95);
+        }
+
+        /* Animación de corazones flotantes por CSS */
+        .heart {
+            position: absolute;
+            color: #ff4d4d;
+            font-size: 24px;
+            user-select: none;
+            pointer-events: none;
+            animation: floatUp 2s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.8) rotate(0deg);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateY(-80px) scale(1.3) rotate(-15deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-150px) scale(1.8) rotate(15deg);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="cardContainer">
+        <h1>¡Felices Fiestas! 🎅</h1>
+        <!-- Lienzo para dibujar a Santa -->
+        <canvas id="santaCanvas" width="300" height="320"></canvas>
+        <br>
+        <button class="btn-kiss" onclick="sendKiss()">¡Mandar Beso! 💋</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('santaCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('cardContainer');
+
+        let isKissing = false;
+        let kissTimer = null;
+
+        // Función para dibujar a Santa Claus
+        function drawSanta(kissing = false) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Gorro - Parte Roja
+            ctx.fillStyle = '#d63031';
+            ctx.beginPath();
+            ctx.moveTo(70, 100);
+            ctx.quadraticCurveTo(150, 10, 230, 100);
+            ctx.fill();
+
+            // Borla del gorro
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(230, 100, 18, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Bordón blanco del gorro
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.roundRect(60, 90, 180, 25, 10);
+            ctx.fill();
+
+            // Cara
+            ctx.fillStyle = '#ffdfc4';
+            ctx.beginPath();
+            ctx.arc(150, 140, 55, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ojos
+            ctx.fillStyle = '#2d3436';
+            if (kissing) {
+                // Ojos picados / guiño de beso (^^)
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#2d3436';
+                
+                // Ojo izquierdo
+                ctx.beginPath();
+                ctx.arc(125, 130, 8, Math.PI, 0);
+                ctx.stroke();
+
+                // Ojo derecho
+                ctx.beginPath();
+                ctx.arc(175, 130, 8, Math.PI, 0);
+                ctx.stroke();
+            } else {
+                // Ojos normales
+                ctx.beginPath();
+                ctx.arc(125, 130, 6, 0, Math.PI * 2);
+                ctx.arc(175, 130, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Mejillas rosadas
+            ctx.fillStyle = 'rgba(255, 118, 117, 0.5)';
+            ctx.beginPath();
+            ctx.arc(115, 142, 10, 0, Math.PI * 2);
+            ctx.arc(185, 142, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Nariz grande y roja
+            ctx.fillStyle = '#e17055';
+            ctx.beginPath();
+            ctx.arc(150, 140, 14, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Gran Barba Blanca
+            ctx.fillStyle = '#f5f6fa';
+            ctx.beginPath();
+            ctx.moveTo(95, 150);
+            ctx.quadraticCurveTo(50, 200, 90, 260);
+            ctx.quadraticCurveTo(150, 300, 210, 260);
+            ctx.quadraticCurveTo(250, 200, 205, 150);
+            ctx.quadraticCurveTo(150, 180, 95, 150);
+            ctx.fill();
+
+            // Bigote
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            // Izquierda
+            ctx.moveTo(150, 152);
+            ctx.quadraticCurveTo(110, 140, 90, 165);
+            ctx.quadraticCurveTo(125, 175, 150, 155);
+            // Derecha
+            ctx.moveTo(150, 152);
+            ctx.quadraticCurveTo(190, 140, 210, 165);
+            ctx.quadraticCurveTo(175, 175, 150, 155);
+            ctx.fill();
+
+            // Boca / Beso
+            if (kissing) {
+                // Boca haciendo "O" (trompita de beso)
+                ctx.fillStyle = '#d63031';
+                ctx.beginPath();
+                ctx.arc(150, 168, 7, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Sonrisa sutil debajo del bigote
+                ctx.strokeStyle = '#d63031';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(150, 160, 8, 0, Math.PI);
+                ctx.stroke();
+            }
+        }
+
+        // Función para activar el beso y la animación de corazones
+        function sendKiss() {
+            // Dibujar a Santa en pose de beso
+            drawSanta(true);
+
+            // Crear corazón de beso
+            createHeart();
+
+            // Resetear animación después de unos milisegundos
+            clearTimeout(kissTimer);
+            kissTimer = setTimeout(() => {
+                drawSanta(false);
+            }, 800);
+        }
+
+        // Generar elementos de corazones que vuelan
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '💋'; // Se puede cambiar por '❤️' o '💖'
+            
+            // Posicionar el corazón cerca de la boca de Santa
+            const rect = canvas.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            const startX = (rect.left - containerRect.left) + 140 + (Math.random() * 20 - 10);
+            const startY = (rect.top - containerRect.top) + 160;
+
+            heart.style.left = `${startX}px`;
+            heart.style.top = `${startY}px`;
+
+            container.appendChild(heart);
+
+            // Eliminar el corazón del DOM al terminar la animación
+            setTimeout(() => {
+                heart.remove();
+            }, 2000);
+        }
+
+        // Dibujar el Santa inicial
+        drawSanta(false);
+
+        // Permitir hacer clic directo en el personaje para tirar besos
+        canvas.addEventListener('click', sendKiss);
+    </script>
+</body>
+</html>
